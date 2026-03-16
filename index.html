@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Almond Milk vs. Air Travel — Carbon Equivalence Calculator</title>
-<meta name="description" content="See how many miles of commercial air travel equal your almond milk habit. Spoiler: flying is way worse.">
+<title>Almond Milk vs. Air Travel — Environmental Impact Calculator</title>
+<meta name="description" content="Compare the full environmental footprint of almond milk vs commercial air travel — carbon AND water.">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; color: #1a1a1a; padding: 24px 16px; }
@@ -12,16 +12,35 @@
   .header { text-align: center; margin-bottom: 28px; }
   .header .label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: #6b7280; margin-bottom: 4px; }
   .header h1 { font-size: 22px; font-weight: 700; }
+  .header .subtitle { font-size: 14px; color: #6b7280; margin-top: 6px; }
   .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
   .input-label { font-size: 14px; font-weight: 600; color: #374151; display: block; margin-bottom: 12px; }
   input[type=range] { width: 100%; accent-color: #3b82f6; margin-bottom: 8px; }
   .input-row { display: flex; justify-content: space-between; align-items: baseline; }
-  .num-input { width: 90px; font-size: 28px; font-weight: 700; border: 1px solid #d1d5db; border-radius: 8px; padding: 4px 10px; text-align: center; }
+  .num-input { width: 110px; font-size: 28px; font-weight: 700; border: 1px solid #d1d5db; border-radius: 8px; padding: 4px 10px; text-align: center; }
   .hint { font-size: 13px; color: #6b7280; }
-  .result { background: linear-gradient(135deg, #eff6ff, #f0fdf4); border: 1px solid #bfdbfe; border-radius: 12px; padding: 24px; margin-bottom: 20px; text-align: center; }
-  .result .sub { font-size: 13px; color: #4b5563; margin-bottom: 4px; }
-  .result .big { font-size: 42px; font-weight: 800; color: #1e40af; line-height: 1.1; }
-  .result .co2 { font-size: 13px; color: #6b7280; margin-top: 6px; }
+
+  /* Converter */
+  .converter { background: #fff; border: 2px solid #e5e7eb; border-radius: 14px; padding: 24px 20px; margin-bottom: 24px; }
+  .converter-row { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+  .conv-side { text-align: center; }
+  .conv-icon { font-size: 32px; line-height: 1; }
+  .conv-value { font-size: 34px; font-weight: 800; line-height: 1.1; }
+  .conv-value.milk { color: #92400e; }
+  .conv-value.flight { color: #1e40af; }
+  .conv-unit { font-size: 12px; color: #6b7280; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .conv-equals { font-size: 28px; font-weight: 300; color: #d1d5db; }
+  .conv-rate { text-align: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid #f3f4f6; font-size: 12px; color: #9ca3af; line-height: 1.5; }
+  .conv-rate strong { color: #6b7280; }
+
+  .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; padding-bottom: 8px; }
+
+  /* Carbon section */
+  .carbon-label { color: #3b82f6; border-bottom: 2px solid #bfdbfe; }
+  .result-carbon { background: linear-gradient(135deg, #eff6ff, #f0fdf4); border: 1px solid #bfdbfe; border-radius: 12px; padding: 24px; margin-bottom: 20px; text-align: center; }
+  .result-carbon .sub { font-size: 13px; color: #4b5563; margin-bottom: 4px; }
+  .result-carbon .big { font-size: 42px; font-weight: 800; color: #1e40af; line-height: 1.1; }
+  .result-carbon .co2 { font-size: 13px; color: #6b7280; margin-top: 6px; }
   .route { margin-bottom: 14px; }
   .route-head { display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 3px; }
   .route-name { color: #374151; }
@@ -31,15 +50,45 @@
   .bar-fill { height: 100%; border-radius: 5px; transition: width 0.3s ease; }
   .bar-fill.done { background: #10b981; }
   .bar-fill.partial { background: #93c5fd; }
+
+  /* Water section */
+  .water-label { color: #0ea5e9; border-bottom: 2px solid #bae6fd; }
+  .result-water { background: linear-gradient(135deg, #f0f9ff, #ecfeff); border: 1px solid #bae6fd; border-radius: 12px; padding: 24px; margin-bottom: 20px; text-align: center; }
+  .result-water .sub { font-size: 13px; color: #4b5563; margin-bottom: 4px; }
+  .result-water .big { font-size: 42px; font-weight: 800; color: #0369a1; line-height: 1.1; }
+  .result-water .detail { font-size: 13px; color: #6b7280; margin-top: 6px; }
+  .water-comparisons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .water-comp { background: #f0f9ff; border: 1px solid #e0f2fe; border-radius: 10px; padding: 14px; text-align: center; }
+  .water-comp .num { font-size: 24px; font-weight: 800; color: #0369a1; }
+  .water-comp .what { font-size: 12px; color: #6b7280; margin-top: 2px; line-height: 1.3; }
+
+  /* Boundary section */
+  .boundary-label { color: #8b5cf6; border-bottom: 2px solid #ddd6fe; }
+  .boundary-card { background: #faf5ff; border: 1px solid #ddd6fe; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .boundary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .boundary-row:last-child { margin-bottom: 0; }
+  .boundary-info { flex: 1; }
+  .boundary-type { font-size: 13px; font-weight: 600; color: #374151; }
+  .boundary-desc { font-size: 11.5px; color: #6b7280; }
+  .boundary-pct { font-size: 22px; font-weight: 800; min-width: 80px; text-align: right; }
+  .boundary-pct.carbon { color: #1e40af; }
+  .boundary-pct.water { color: #0369a1; }
+  .boundary-bar-bg { height: 6px; border-radius: 3px; background: #e5e7eb; margin-top: 4px; }
+  .boundary-bar { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
+  .boundary-bar.carbon { background: #3b82f6; }
+  .boundary-bar.water { background: #0ea5e9; }
+
   .footnote { margin-top: 16px; padding: 14px 0 0; font-size: 11.5px; color: #6b7280; line-height: 1.5; border-top: 1px solid #e5e7eb; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="header">
-    <div class="label">Carbon Equivalence Calculator</div>
+    <div class="label">Environmental Impact Calculator</div>
     <h1>Almond Milk vs. Air Travel</h1>
+    <div class="subtitle">The full picture: carbon <em>and</em> water</div>
   </div>
+
   <div class="card">
     <label class="input-label" for="slider">How many glasses of almond milk?</label>
     <input type="range" id="slider" min="1" max="3650" value="365">
@@ -48,49 +97,170 @@
       <span class="hint" id="hint"></span>
     </div>
   </div>
-  <div class="result">
+
+  <!-- CONVERTER -->
+  <div class="converter">
+    <div class="converter-row">
+      <div class="conv-side">
+        <div class="conv-icon">🥛</div>
+        <div class="conv-value milk" id="convGlasses">365</div>
+        <div class="conv-unit">glasses</div>
+      </div>
+      <div class="conv-equals">=</div>
+      <div class="conv-side">
+        <div class="conv-icon">✈️</div>
+        <div class="conv-value flight" id="convMiles">828</div>
+        <div class="conv-unit">miles of flight</div>
+      </div>
+    </div>
+    <div class="conv-rate">
+      Exchange rate: <strong>1 glass = 2.3 miles</strong><br>
+      Combined carbon + water planetary boundary impact
+    </div>
+  </div>
+
+  <!-- CARBON -->
+  <div class="section-label carbon-label">Carbon Footprint</div>
+
+  <div class="result-carbon">
     <div class="sub">That's equivalent to flying</div>
     <div class="big" id="milesOut"></div>
     <div class="co2" id="co2Out"></div>
   </div>
+
   <div class="card">
     <div class="input-label">That gets you this far by air:</div>
     <div id="routes"></div>
   </div>
+
+  <!-- WATER -->
+  <div class="section-label water-label">Water Footprint</div>
+
+  <div class="result-water">
+    <div class="sub">Those glasses of almond milk required</div>
+    <div class="big" id="waterOut"></div>
+    <div class="detail" id="waterDetail"></div>
+  </div>
+
+  <div class="card">
+    <div class="input-label">That's roughly equal to:</div>
+    <div class="water-comparisons">
+      <div class="water-comp">
+        <div class="num" id="showers"></div>
+        <div class="what">8-minute showers</div>
+      </div>
+      <div class="water-comp">
+        <div class="num" id="pools"></div>
+        <div class="what">bathtubs filled</div>
+      </div>
+      <div class="water-comp">
+        <div class="num" id="drinking"></div>
+        <div class="what">days of drinking water</div>
+      </div>
+      <div class="water-comp">
+        <div class="num" id="flightWater"></div>
+        <div class="what">gallons used by equiv. flight</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLANETARY BOUNDARY -->
+  <div class="section-label boundary-label">Planetary Boundary Context</div>
+
+  <div class="boundary-card">
+    <div style="font-size: 12.5px; color: #6b7280; margin-bottom: 14px; line-height: 1.5;">
+      Share of your annual per-capita safe planetary budget:
+    </div>
+    <div class="boundary-row">
+      <div class="boundary-info">
+        <div class="boundary-type">Carbon budget</div>
+        <div class="boundary-desc">~1,500 kg CO₂e/person/year</div>
+        <div class="boundary-bar-bg"><div class="boundary-bar carbon" id="carbonBar"></div></div>
+      </div>
+      <div class="boundary-pct carbon" id="carbonPct"></div>
+    </div>
+    <div class="boundary-row">
+      <div class="boundary-info">
+        <div class="boundary-type">Freshwater budget</div>
+        <div class="boundary-desc">~500,000 liters/person/year</div>
+        <div class="boundary-bar-bg"><div class="boundary-bar water" id="waterBar"></div></div>
+      </div>
+      <div class="boundary-pct water" id="waterPct"></div>
+    </div>
+  </div>
+
   <div class="footnote">
-    <strong>Assumptions:</strong> ~0.35 kg CO₂e per glass of almond milk (production, processing, packaging); ~0.25 kg CO₂e per passenger-mile of commercial flight (average load factor). Both are midpoint estimates. A glass of almond milk contains roughly 15–20g of actual almonds.
+    <strong>Assumptions:</strong> ~0.35 kg CO₂e per glass of almond milk; ~0.25 kg CO₂e per passenger-mile of flight; ~74 liters of water per glass of almond milk (~17g almonds at ~4,300 liters/kg); ~0.5 liters of water per passenger-mile of flight (minimal). Planetary boundary budgets: ~1,500 kg CO₂e/person/year (1.5°C pathway), ~500,000 liters consumptive freshwater/person/year (Rockström). Combined rate: each glass uses 0.038% of combined boundaries vs. 0.017% per flight mile, yielding 1 glass ≈ 2.3 equivalent flight miles.
   </div>
 </div>
 <script>
 const CO2_PER_GLASS = 0.35;
 const CO2_PER_MILE = 0.25;
-const MILES_PER_GLASS = CO2_PER_GLASS / CO2_PER_MILE;
+const MILES_PER_GLASS_CARBON = CO2_PER_GLASS / CO2_PER_MILE;
+
+const WATER_PER_GLASS_L = 74;
+const WATER_PER_FLIGHT_MILE_L = 0.5;
+
+const CARBON_BUDGET = 1500;
+const WATER_BUDGET = 500000;
+
+// Planetary boundary fractions per unit
+const GLASS_CARBON_FRAC = CO2_PER_GLASS / CARBON_BUDGET;       // 0.000233
+const GLASS_WATER_FRAC = WATER_PER_GLASS_L / WATER_BUDGET;     // 0.000148
+const GLASS_COMBINED = GLASS_CARBON_FRAC + GLASS_WATER_FRAC;   // 0.000381
+
+const MILE_CARBON_FRAC = CO2_PER_MILE / CARBON_BUDGET;         // 0.000167
+const MILE_WATER_FRAC = WATER_PER_FLIGHT_MILE_L / WATER_BUDGET;// 0.000001
+const MILE_COMBINED = MILE_CARBON_FRAC + MILE_WATER_FRAC;      // 0.000168
+
+const BOUNDARY_MILES_PER_GLASS = GLASS_COMBINED / MILE_COMBINED; // ~2.27
+
+const SHOWER_L = 65;
+const BATHTUB_L = 150;
+const DRINKING_L = 2;
+
 const ROUTES = [
-  ["New York → Washington DC", 228],
-  ["New York → Chicago", 740],
-  ["New York → Los Angeles", 2475],
-  ["New York → London", 3459],
-  ["New York → Tokyo", 6760],
+  ["Boston → Washington DC", 393],
+  ["Boston → Chicago", 867],
+  ["Boston → Los Angeles", 2611],
+  ["Boston → Medellín", 2700],
+  ["Boston → Madrid", 3415],
 ];
 
 const slider = document.getElementById("slider");
 const numInput = document.getElementById("numInput");
-const hint = document.getElementById("hint");
-const milesOut = document.getElementById("milesOut");
-const co2Out = document.getElementById("co2Out");
-const routesEl = document.getElementById("routes");
 
 function fmt(n) { return n >= 1000 ? n.toLocaleString("en-US", {maximumFractionDigits:0}) : n.toFixed(1); }
+function fmtInt(n) { return Math.round(n).toLocaleString("en-US"); }
 
 function render(g) {
-  const miles = g * MILES_PER_GLASS;
+  const boundaryMiles = g * BOUNDARY_MILES_PER_GLASS;
+  const carbonMiles = g * MILES_PER_GLASS_CARBON;
   const co2 = g * CO2_PER_GLASS;
-  hint.textContent = g <= 365 ? (g/7).toFixed(1) + " weeks at 1/day" : (g/365).toFixed(1) + " years at 1/day";
-  milesOut.textContent = fmt(miles) + " miles";
-  co2Out.textContent = fmt(co2) + " kg CO₂e total";
-  routesEl.innerHTML = ROUTES.map(([name, rm]) => {
-    const pct = Math.min(100, miles / rm * 100);
-    const done = miles >= rm;
+  const waterL = g * WATER_PER_GLASS_L;
+  const waterGal = waterL * 0.264172;
+  const flightWaterL = carbonMiles * WATER_PER_FLIGHT_MILE_L;
+  const flightWaterGal = flightWaterL * 0.264172;
+
+  const carbonPct = (co2 / CARBON_BUDGET) * 100;
+  const waterPct = (waterL / WATER_BUDGET) * 100;
+
+  document.getElementById("hint").textContent = g <= 365
+    ? (g/7).toFixed(1) + " weeks at 1/day"
+    : (g/365).toFixed(1) + " years at 1/day";
+
+  // Converter — combined boundary rate
+  document.getElementById("convGlasses").textContent = fmtInt(g);
+  document.getElementById("convMiles").textContent = fmt(boundaryMiles);
+
+  // Carbon results — carbon-only rate
+  document.getElementById("milesOut").textContent = fmt(carbonMiles) + " miles";
+  document.getElementById("co2Out").textContent = fmt(co2) + " kg CO₂e total";
+
+  // Routes use combined boundary miles
+  document.getElementById("routes").innerHTML = ROUTES.map(([name, rm]) => {
+    const pct = Math.min(100, boundaryMiles / rm * 100);
+    const done = boundaryMiles >= rm;
     return `<div class="route">
       <div class="route-head">
         <span class="route-name ${done?"done":""}">${done?"✓ ":""}${name}</span>
@@ -99,6 +269,19 @@ function render(g) {
       <div class="bar-bg"><div class="bar-fill ${done?"done":"partial"}" style="width:${pct}%"></div></div>
     </div>`;
   }).join("");
+
+  document.getElementById("waterOut").textContent = fmtInt(waterGal) + " gallons";
+  document.getElementById("waterDetail").textContent = fmtInt(waterL) + " liters";
+
+  document.getElementById("showers").textContent = fmtInt(waterL / SHOWER_L);
+  document.getElementById("pools").textContent = fmtInt(waterL / BATHTUB_L);
+  document.getElementById("drinking").textContent = fmtInt(waterL / DRINKING_L);
+  document.getElementById("flightWater").textContent = fmtInt(flightWaterGal);
+
+  document.getElementById("carbonPct").textContent = carbonPct.toFixed(2) + "%";
+  document.getElementById("carbonBar").style.width = Math.min(100, carbonPct) + "%";
+  document.getElementById("waterPct").textContent = waterPct.toFixed(2) + "%";
+  document.getElementById("waterBar").style.width = Math.min(100, waterPct) + "%";
 }
 
 slider.addEventListener("input", () => { numInput.value = slider.value; render(+slider.value); });
